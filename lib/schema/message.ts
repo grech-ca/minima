@@ -7,7 +7,6 @@ export const Message = objectType({
   definition(t) {
     t.string('id');
     t.string('content');
-    t.string('authorId');
 
     t.field('author', {
       type: 'User',
@@ -20,3 +19,7 @@ export const Message = objectType({
     });
   },
 });
+
+// export const sendMessageSubscriptionField = subscriptionField('message', {
+
+// })

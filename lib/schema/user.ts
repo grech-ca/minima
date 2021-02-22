@@ -1,3 +1,4 @@
+import { ApolloError } from 'apollo-server-micro';
 import { objectType, queryField, nonNull, stringArg, list } from 'nexus';
 
 import prisma from '../../lib/prisma';
@@ -18,6 +19,15 @@ export const User = objectType({
           })
           .conversations(),
     });
+  },
+});
+
+export const meQueryField = queryField('me', {
+  type: 'User',
+  resolve: async (_, __, { user }) => {
+    if (!user) throw new ApolloError('Token is not provided');
+
+    return await prisma.user.findUnique({ where: { id: user.id } });
   },
 });
 

@@ -29,13 +29,23 @@ const verifyToken = (token?: string) => {
   }
 };
 
-export default new ApolloServer({
+const server = new ApolloServer({
   schema,
-  context: ({ req }) => {
-    const user = verifyToken(req.headers.authorization);
+  context: ({ req, connection }) => {
+    if (connection) {
+      const user = verifyToken(connection.context.authorization);
 
-    return {
-      user,
-    };
+      return {
+        user,
+      };
+    } else {
+      const user = verifyToken(req.headers.authorization);
+
+      return {
+        user,
+      };
+    }
   },
 }).createHandler({ path: '/api' });
+
+export default server;

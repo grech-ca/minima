@@ -32,7 +32,7 @@ export const signupMutationField = mutationField('signup', {
     password: nonNull(stringArg()),
     email: nonNull(stringArg()),
   },
-  resolve: async (_, args, context) => {
+  resolve: async (_, args) => {
     await signupSchema.validate(args).catch(err => {
       throw new ApolloError(err);
     });
@@ -50,12 +50,6 @@ export const signupMutationField = mutationField('signup', {
     });
 
     const token = jwt.sign({ id: user.id }, process.env.SECRET!);
-    context.cookies.set('auth-token', token, {
-      httpOnly: true,
-      sameSite: 'lax',
-      maxAge: 6 * 60 * 60,
-      secure: process.env.NODE_ENV === 'production',
-    });
 
     return {
       authToken: token,

@@ -1,4 +1,4 @@
-import { ApolloError } from 'apollo-server-errors';
+import { ApolloError } from 'apollo-server';
 import { objectType, queryField, nonNull, stringArg, mutationField, booleanArg, list } from 'nexus';
 
 import prisma from '../../lib/prisma';
@@ -37,10 +37,18 @@ export const conversationQueryField = queryField('conversation', {
   args: {
     conversationId: nonNull(stringArg()),
   },
-  resolve: (_, { conversationId }) =>
-    prisma.conversation.findUnique({
+  resolve: (_, { conversationId }, { user }) => {
+    const conversation = prisma.conversation.findUnique({
       where: { id: conversationId },
-    }),
+      include: { members: true },
+    });
+
+    const userInConversation = conversation.members.some(({ id }) => id === user.id);
+
+    if (!userInConversation) throw new ApolloError('Access denied');
+
+    return conversation;
+  },
 });
 
 export const createConversationMutationField = mutationField('createConversation', {
@@ -68,5 +76,46 @@ export const createConversationMutationField = mutationField('createConversation
     });
 
     return conversation;
+  },
+});
+
+export const sendMessageMutationField = mutationField('sendMessage', {
+  type: 'Message',
+  args: {
+    conversationId: nonNull(stringArg()),
+    content: nonNull(stringArg()),
+  },
+  resolve: async (_, { content, conversationId }, { user }) => {
+    const conversation = await prisma.conversation.findUnique({
+      where: { id: conversationId },
+      include: { members: true },
+    });
+
+    const userInConversation = conversation.members.some(({ id }) => id === user.id);
+
+    if (!userInConversation) throw new ApolloError('Access denied');
+
+    const message = await prisma.message.create({
+      data: {
+        author: {
+          connect: { id: user.id },
+        },
+        content,
+        conversation: {
+          connect: { id: conversationId },
+        },
+      },
+    });
+
+    await prisma.conversation.update({
+      where: { id: conversationId },
+      data: {
+        messages: {
+          connect: [{ id: message.id }],
+        },
+      },
+    });
+
+    return message;
   },
 });
