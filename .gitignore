@@ -20,7 +20,7 @@
 /prisma/*
 !/prisma/schema.prisma
 /pages/api/*
-!/pages/api/index.ts
+!/pages/api/graphql.ts
 
 # misc
 .DS_Store

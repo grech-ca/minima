@@ -1,7 +1,12 @@
 import { ApolloError } from 'apollo-server';
-import { objectType, queryField, nonNull, stringArg, mutationField, booleanArg, list } from 'nexus';
+import { withFilter } from 'graphql-subscriptions';
+import { objectType, queryField, nonNull, stringArg, mutationField, booleanArg, list, subscriptionField } from 'nexus';
 
 import prisma from '../../lib/prisma';
+
+import { ServerContext } from 'pages/api';
+
+import { NexusGenFieldTypes } from 'pages/api/nexus-typegen';
 
 export const Conversation = objectType({
   name: 'Conversation',
@@ -37,8 +42,8 @@ export const conversationQueryField = queryField('conversation', {
   args: {
     conversationId: nonNull(stringArg()),
   },
-  resolve: (_, { conversationId }, { user }) => {
-    const conversation = prisma.conversation.findUnique({
+  resolve: async (_, { conversationId }, { user }) => {
+    const conversation = await prisma.conversation.findUnique({
       where: { id: conversationId },
       include: { members: true },
     });
@@ -85,7 +90,7 @@ export const sendMessageMutationField = mutationField('sendMessage', {
     conversationId: nonNull(stringArg()),
     content: nonNull(stringArg()),
   },
-  resolve: async (_, { content, conversationId }, { user }) => {
+  resolve: async (_, { content, conversationId }, { user, pubsub }) => {
     const conversation = await prisma.conversation.findUnique({
       where: { id: conversationId },
       include: { members: true },
@@ -116,6 +121,29 @@ export const sendMessageMutationField = mutationField('sendMessage', {
       },
     });
 
+    pubsub.publish('sendMessage', {
+      ...message,
+    });
+
     return message;
   },
+});
+
+export const conversationSubscriptionField = subscriptionField('conversationMessages', {
+  type: 'Message',
+  args: { conversationId: nonNull(stringArg()) },
+  subscribe: withFilter(
+    (_, __, { pubsub }: ServerContext) => pubsub.asyncIterator('sendMessage'),
+    async (_, { conversationId }, { user }) => {
+      const conversation = await prisma.conversation.findUnique({
+        where: { id: conversationId },
+        include: { members: true },
+      });
+
+      const access = conversation.members.some(({ id }) => id === user.id);
+
+      return access;
+    },
+  ),
+  resolve: (payload: NexusGenFieldTypes['Conversation']) => payload,
 });
