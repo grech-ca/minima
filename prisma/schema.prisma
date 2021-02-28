@@ -32,5 +32,35 @@ model User {
   email         String         @unique
   password      String
   conversations Conversation[]
-  Message       Message[]
+  messages      Message[]
+  posts         Post[]
+  savedPosts    Post[]         @relation("savedPosts")
+  likedPOsts    Post[]         @relation("likedPosts")
+  comments      Comment[]
+}
+
+model Post {
+  id        String    @id @default(cuid())
+  title     String
+  slug      String    @unique
+  content   String
+  author    User      @relation(fields: [authorId], references: [id])
+  authorId  String
+  savedBy   User[]    @relation("savedPosts")
+  likedBy   User[]    @relation("likedPosts")
+  createdAt DateTime  @default(now())
+  comments  Comment[]
+}
+
+model Comment {
+  id              String    @id @default(cuid())
+  author          User      @relation(fields: [authorId], references: [id])
+  authorId        String
+  content         String
+  replyTo         Comment?  @relation("repliedComments", fields: [replyToId], references: [id])
+  replyToId       String?
+  post            Post      @relation(fields: [postId], references: [id])
+  postId          String
+  createdAt       DateTime  @default(now())
+  repliedComments Comment[] @relation("repliedComments")
 }

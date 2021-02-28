@@ -8,7 +8,6 @@ import { PubSub } from 'graphql-subscriptions';
 import { makeSchema } from 'nexus';
 import jwt from 'jsonwebtoken';
 import * as allTypes from '../../lib/schema';
-import { connect } from 'cookies';
 
 export interface ServerContext {
   user: any;
