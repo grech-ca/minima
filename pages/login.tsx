@@ -14,7 +14,7 @@ const Login: FC = () => {
   return (
     <Fragment>
       <div className="container px-10 flex items-center justify-center h-full mx-auto">
-        <Image src="/svg/login.svg" className="pointer-events-none flex-1" alt="" width={700} height={700} />
+        <Image src="/illustrations/login.svg" className="pointer-events-none flex-1" alt="" width={700} height={700} />
         <div className="flex flex-col bg-white rounded-xl ml-10 px-10 py-16">
           <h1 className="text-4xl font-black mb-12 text-gray-700 text-center mx-10">Join Minima flow</h1>
           <form className="flex flex-col flex-1 mb-3">
