@@ -21,6 +21,7 @@
 !/prisma/schema.prisma
 /pages/api/*
 !/pages/api/graphql.ts
+generated
 
 # misc
 .DS_Store

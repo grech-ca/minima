@@ -56,6 +56,15 @@ export const conversationQueryField = queryField('conversation', {
   },
 });
 
+export const conversationsQueryField = queryField('conversations', {
+  type: list('Conversation'),
+  resolve: async () => {
+    const conversations = await prisma.conversation.findMany({});
+
+    return conversations;
+  },
+});
+
 export const createConversationMutationField = mutationField('createConversation', {
   type: 'Conversation',
   args: { personal: booleanArg(), users: list(nonNull(stringArg())) },
@@ -67,6 +76,8 @@ export const createConversationMutationField = mutationField('createConversation
     if (!personal && users.length < 1) throw new ApolloError('Chat must have at least 2 users');
 
     const mappedUsers = [user.id, ...users].map(id => ({ id }));
+
+    console.log(mappedUsers);
 
     const conversation = await prisma.conversation.create({
       data: {

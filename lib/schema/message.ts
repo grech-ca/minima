@@ -1,4 +1,4 @@
-import { objectType } from 'nexus';
+import { nonNull, objectType, stringArg, queryField, list } from 'nexus';
 
 import prisma from '../../lib/prisma';
 
@@ -20,6 +20,11 @@ export const Message = objectType({
   },
 });
 
-// export const sendMessageSubscriptionField = subscriptionField('message', {
-
-// })
+export const messagesQueryField = queryField('messages', {
+  type: list('Message'),
+  args: {
+    conversationId: nonNull(stringArg()),
+  },
+  resolve: async (_, { conversationId }) =>
+    await prisma.message.findMany({ where: { conversation: { id: conversationId } } }),
+});
