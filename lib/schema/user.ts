@@ -46,24 +46,3 @@ export const usersQueryField = queryField('users', {
   type: list(nonNull('User')),
   resolve: () => prisma.user.findMany({ where: {} }),
 });
-
-export const nameExistsQueryField = queryField('nameExists', {
-  type: 'Boolean',
-  args: { name: nonNull(stringArg()) },
-  resolve: async (_, { name }) => {
-    const user = await prisma.user.findFirst({ where: { name: { equals: name } } });
-
-    return Boolean(user);
-  },
-});
-
-export const emailExistsQueryField = queryField('emailExists', {
-  type: 'Boolean',
-  args: { email: nonNull(stringArg()) },
-  resolve: async (_, { email }) => {
-    const user = await prisma.user.findFirst({ where: { email: { equals: email } } });
-    console.log(user);
-
-    return Boolean(user);
-  },
-});

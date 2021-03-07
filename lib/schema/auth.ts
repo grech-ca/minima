@@ -8,13 +8,29 @@ import * as yup from 'yup';
 
 import prisma from '../../lib/prisma';
 
+export interface FormErrors {
+  [key: string]: string;
+}
+
 const signupSchema = yup.object().shape({
   username: yup
     .string()
     .required()
     .min(3)
-    .matches(/^(?=.{8,20}$)(?![_.])(?!.*[_.]{2})[a-zA-Z0-9._]+(?<![_.])$/),
-  email: yup.string().email(),
+    .matches(/^[a-z0-9_-]{3,16}$/)
+    .test('checkIfNameTaken', 'Name is already taken', async (value: string) => {
+      const user = await prisma.user.findFirst({ where: { name: { equals: value } } });
+
+      return !user;
+    }),
+  email: yup
+    .string()
+    .email()
+    .test('checkIfEmailTaken', 'Email is already taken', async (value: string) => {
+      const user = await prisma.user.findFirst({ where: { email: { equals: value } } });
+
+      return !user;
+    }),
   password: yup.string().min(5),
 });
 
@@ -33,8 +49,12 @@ export const signupMutationField = mutationField('signup', {
     email: nonNull(stringArg()),
   },
   resolve: async (_, args) => {
-    await signupSchema.validate(args).catch(err => {
-      throw new ApolloError(err);
+    await signupSchema.validate(args, { abortEarly: false }).catch(errors => {
+      const schemaErrors: FormErrors = errors.inner.reduce((errorsObject: FormErrors, { path, message }: any) => {
+        return { ...errorsObject, [path]: message };
+      }, {});
+
+      throw new ApolloError('Validation Failed', 'VALIDATION_SCHEMA_ERROR', { validationErrors: schemaErrors });
     });
 
     const { password, username, email } = args;
