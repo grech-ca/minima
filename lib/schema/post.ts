@@ -3,7 +3,9 @@ import { objectType, list, nonNull, stringArg, queryField, mutationField, inputO
 import slugify from 'slugify';
 import shortid from 'shortid';
 
-import prisma from '../../lib/prisma';
+import prisma from '../prisma';
+
+import isAuthenticated from '../rules/isAuthenticated';
 
 export const Post = objectType({
   name: 'Post',
@@ -70,6 +72,7 @@ export const createPostMutationField = mutationField('createPost', {
   args: {
     data: 'CreatePostInput',
   },
+  shield: isAuthenticated(),
   resolve: async (_, { data }, { user }) => {
     const generatedSlug = slugify(data.title, {
       lower: true,
