@@ -135,6 +135,7 @@ export const sendMessageMutationField = mutationField('sendMessage', {
 export const conversationSubscriptionField = subscriptionField('conversationMessages', {
   type: 'Message',
   args: { conversationId: nonNull(stringArg()) },
+  shield: chain(isAuthenticated(), isInChat()),
   subscribe: withFilter(
     (_, __, { pubsub }: ServerContext) => pubsub.asyncIterator('sendMessage'),
     async (_, { conversationId }, { user }) => {
