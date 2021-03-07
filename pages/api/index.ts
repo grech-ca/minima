@@ -64,14 +64,12 @@ const pubsub = new PubSub();
 const server = new ApolloServer({
   schema,
   context: ({ req, connection }): ServerContext => {
-    if (!connection) {
-      const user = verifyToken(req.headers.authorization);
+    const user = verifyToken(connection ? connection.context.authorization : req.headers.authorization);
 
-      return {
-        user,
-        pubsub,
-      };
-    }
+    return {
+      user,
+      pubsub,
+    };
   },
   subscriptions: {
     path: '/subscriptions',
