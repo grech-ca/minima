@@ -20,6 +20,13 @@ export const Conversation = objectType({
 
     t.boolean('personal');
 
+    t.model.createdAt();
+
+    t.field('createdBy', {
+      type: 'User',
+      resolve: async ({ id }) => await prisma.conversation.findUnique({ where: { id } }).createdBy(),
+    });
+
     t.list.field('members', {
       type: 'User',
       resolve: ({ id }) =>
@@ -82,6 +89,11 @@ export const createConversationMutationField = mutationField('createConversation
     const conversation = await prisma.conversation.create({
       data: {
         personal,
+        createdBy: {
+          connect: {
+            id: user.id,
+          },
+        },
         messages: {
           connect: [],
         },

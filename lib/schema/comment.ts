@@ -25,6 +25,8 @@ export const Comment = objectType({
       type: 'Comment',
       resolve: async ({ id }) => await prisma.comment.findUnique({ where: { id } }).replyTo(),
     });
+
+    t.model.createdAt();
   },
 });
 

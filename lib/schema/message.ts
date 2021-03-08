@@ -13,6 +13,8 @@ export const Message = objectType({
     t.string('id');
     t.string('content');
 
+    t.model.createdAt();
+
     t.field('author', {
       type: 'User',
       resolve: ({ id }) =>

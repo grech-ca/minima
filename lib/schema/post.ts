@@ -16,6 +16,8 @@ export const Post = objectType({
     t.string('slug');
     t.string('content');
 
+    t.model.createdAt();
+
     t.field('author', {
       type: 'User',
       resolve: async ({ id }) => await prisma.post.findUnique({ where: { id } }).author(),

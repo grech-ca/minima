@@ -1,10 +1,7 @@
+import { ApolloError } from 'apollo-server-micro';
 import { objectType, queryField, nonNull, stringArg, list } from 'nexus';
-import { chain } from 'nexus-shield';
 
 import prisma from '../../lib/prisma';
-
-import isAuthenticated from '../rules/isAuthenticated';
-import isMyself from '../rules/isMyself';
 
 export const User = objectType({
   name: 'User',
@@ -13,9 +10,10 @@ export const User = objectType({
     t.string('name');
     t.string('email');
 
+    t.model.createdAt();
+
     t.list.field('conversations', {
       type: 'Conversation',
-      shield: chain(isAuthenticated(), isMyself()),
       resolve: ({ id }) =>
         prisma.user
           .findUnique({
@@ -28,7 +26,11 @@ export const User = objectType({
 
 export const meQueryField = queryField('me', {
   type: 'User',
-  resolve: async (_, __, { user }) => await prisma.user.findUnique({ where: { id: user.id } }), // check for token
+  resolve: async (_, __, { user }) => {
+    if (!user) throw new ApolloError('Token is not provided');
+
+    return await prisma.user.findUnique({ where: { id: user.id } });
+  },
 });
 
 export const userQueryField = queryField('user', {
