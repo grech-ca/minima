@@ -2,11 +2,14 @@ import path from 'path';
 
 import { NextApiRequest, NextApiResponse } from 'next';
 
-import { ApolloServer } from 'apollo-server-micro';
+import { ApolloError, ApolloServer } from 'apollo-server-micro';
 import { PubSub } from 'graphql-subscriptions';
 
 import { makeSchema } from 'nexus';
+import { nexusShield } from 'nexus-shield';
+import { nexusPrisma } from 'nexus-plugin-prisma';
 import jwt from 'jsonwebtoken';
+
 import * as allTypes from '../../lib/schema';
 
 export interface ServerContext {
@@ -33,6 +36,12 @@ const schema = makeSchema({
     typegen: path.join(process.cwd(), 'pages/api/nexus-typegen.ts'),
     schema: path.join(process.cwd(), 'pages/api/schema.graphql'),
   },
+  plugins: [
+    nexusShield({
+      defaultError: new ApolloError('Internal Server Error'),
+    }),
+    nexusPrisma({ experimentalCRUD: true }),
+  ],
 });
 
 export const config = {
@@ -55,14 +64,12 @@ const pubsub = new PubSub();
 const server = new ApolloServer({
   schema,
   context: ({ req, connection }): ServerContext => {
-    if (!connection) {
-      const user = verifyToken(req.headers.authorization);
+    const user = verifyToken(connection ? connection.context.authorization : req.headers.authorization);
 
-      return {
-        user,
-        pubsub,
-      };
-    }
+    return {
+      user,
+      pubsub,
+    };
   },
   subscriptions: {
     path: '/subscriptions',

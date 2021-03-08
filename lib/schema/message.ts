@@ -1,6 +1,11 @@
 import { nonNull, objectType, stringArg, queryField, list } from 'nexus';
 
-import prisma from '../../lib/prisma';
+import { chain } from 'nexus-shield';
+
+import prisma from '../prisma';
+
+import isAuthenticated from '../rules/isAuthenticated';
+import isInChat from '../rules/isInChat';
 
 export const Message = objectType({
   name: 'Message',
@@ -25,6 +30,7 @@ export const messagesQueryField = queryField('messages', {
   args: {
     conversationId: nonNull(stringArg()),
   },
+  shield: chain(isAuthenticated(), isInChat()),
   resolve: async (_, { conversationId }) =>
     await prisma.message.findMany({ where: { conversation: { id: conversationId } } }),
 });

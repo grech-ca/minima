@@ -1,6 +1,8 @@
 import { objectType, mutationField, inputObjectType } from 'nexus';
 
-import prisma from '../../lib/prisma';
+import prisma from '../prisma';
+
+import isAuthenticated from '../rules/isAuthenticated';
 
 export const Comment = objectType({
   name: 'Comment',
@@ -39,6 +41,7 @@ export const CreateCommentInput = inputObjectType({
 export const createCommentMutationField = mutationField('createComment', {
   type: 'Comment',
   args: { data: CreateCommentInput },
+  shield: isAuthenticated(),
   resolve: async (_, { data: { content, postId, replyToId } }, { user }) =>
     await prisma.comment.create({
       data: {
