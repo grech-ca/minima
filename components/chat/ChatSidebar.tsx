@@ -1,4 +1,6 @@
-import { FC, useCallback } from 'react';
+import { FC, useCallback, useState, useMemo, ChangeEvent } from 'react';
+
+import { matchSorter } from 'match-sorter';
 
 import ChatTab from 'components/chat/ChatTab';
 
@@ -24,9 +26,24 @@ const ChatSidebar: FC = () => {
 
   const { data } = useConversationsQuery();
   const { me } = data || {};
-  const { conversations } = me || {};
+  const { conversations = [] } = me || {};
 
   const dispatch = useAppDispatch();
+
+  const [search, setSearch] = useState('');
+
+  const handleChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+
+    switch (name) {
+      case 'search':
+        return setSearch(value);
+    }
+  }, []);
+
+  const chatsBySearch = useMemo(() => {
+    return matchSorter(conversations, search, { keys: ['members.*.name'] });
+  }, [conversations, search]);
 
   const handleClick = useCallback(id => dispatch(setActiveChat(id)), [dispatch]);
 
@@ -38,6 +55,9 @@ const ChatSidebar: FC = () => {
         <input
           className="flex-1 text-gray-600 rounded-md bg-gray-50 placeholder-gray-300 py-1 px-3 focus:outline-none focus:ring-2 focus:ring-indigo-300"
           placeholder="Search"
+          name="search"
+          value={search}
+          onChange={handleChange}
         />
         <button
           onClick={openCreateChat}
@@ -47,7 +67,7 @@ const ChatSidebar: FC = () => {
         </button>
       </div>
       <ul className="flex flex-col">
-        {conversations?.map(({ id, members }) => (
+        {(search ? chatsBySearch : conversations).map(({ id, members }) => (
           <ChatTab onClick={handleClick} active={id === activeChat} key={id} id={id} name={getMembersNames(members)} />
         ))}
       </ul>
