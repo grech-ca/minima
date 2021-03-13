@@ -1,17 +1,21 @@
-import { FC } from 'react';
+import { FC, Fragment } from 'react';
 
 import Header from 'components/common/Header';
 import ChatSidebar from 'components/chat/ChatSidebar';
 import Chat from 'components/chat/Chat';
+import CreateChat from 'components/chat/CreateChat';
 
 const Posts: FC = () => (
-  <div className="flex flex-col h-full">
-    <Header />
-    <div className="flex-1 container flex my-6 align-start overflow-y-hidden">
-      <ChatSidebar />
-      <Chat />
+  <Fragment>
+    <div className="flex flex-col h-full">
+      <Header />
+      <div className="flex-1 container flex my-6 align-start overflow-y-hidden">
+        <ChatSidebar />
+        <Chat />
+      </div>
     </div>
-  </div>
+    <CreateChat />
+  </Fragment>
 );
 
 export default Posts;

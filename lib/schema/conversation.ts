@@ -1,8 +1,9 @@
-import { ApolloError } from 'apollo-server';
 import { withFilter } from 'graphql-subscriptions';
 
 import { objectType, queryField, nonNull, stringArg, mutationField, booleanArg, list, subscriptionField } from 'nexus';
 import { chain } from 'nexus-shield';
+
+import * as yup from 'yup';
 
 import { ServerContext } from 'pages/api';
 
@@ -11,14 +12,23 @@ import prisma from '../prisma';
 import isAuthenticated from '../rules/isAuthenticated';
 import isInChat from '../rules/isInChat';
 
+import validateSchema from '../utils/validateSchema';
+
+import FormError from '../errors/FormError';
+
 import { NexusGenFieldTypes } from 'pages/api/nexus-typegen';
+
+interface ConversationSchema {
+  multiple?: boolean;
+  users?: string[];
+}
 
 export const Conversation = objectType({
   name: 'Conversation',
   definition(t) {
     t.string('id');
 
-    t.boolean('personal');
+    t.boolean('multiple');
 
     t.model.createdAt();
 
@@ -77,18 +87,48 @@ export const conversationsQueryField = queryField('conversations', {
 
 export const createConversationMutationField = mutationField('createConversation', {
   type: 'Conversation',
-  args: { personal: booleanArg(), users: list(nonNull(stringArg())) },
+  args: { multiple: booleanArg({ default: false }), members: list(nonNull(stringArg())) },
   shield: isAuthenticated(),
-  resolve: async (_, { personal = true, users }, { user }) => {
-    if (!users.length) throw new ApolloError('No users provided');
-    if (personal && users.length > 1) throw new ApolloError('Personal conversation must have only 2 users');
-    if (!personal && users.length < 1) throw new ApolloError('Chat must have at least 2 users');
+  resolve: async (_, { multiple, members }, { user }) => {
+    const args = {
+      multiple,
+      members: members.filter(id => id !== user.id),
+    };
 
-    const mappedUsers = [user.id, ...users].map(id => ({ id }));
+    const conversationSchema = yup.object().shape({
+      multiple: yup.boolean(),
+      members: yup
+        .array()
+        .of(yup.string())
+        .min(1)
+        .when('multiple', {
+          is: false,
+          then: schema =>
+            schema.max(1).test({
+              name: 'isPersonalChatExists',
+              test: async membersIds => {
+                const chat = await prisma.conversation.findFirst({
+                  where: {
+                    AND: [{ multiple: false }, { members: { every: { id: { in: [...membersIds, user.id] } } } }],
+                  },
+                });
+
+                return chat === null;
+              },
+              message: 'You already have a personal chat with this person',
+            }),
+        }),
+    });
+
+    await validateSchema<ConversationSchema>(args, conversationSchema).catch(errors => {
+      throw new FormError(errors);
+    });
+
+    const mappedUsers = [user.id, ...members].map(id => ({ id }));
 
     const conversation = await prisma.conversation.create({
       data: {
-        personal,
+        multiple,
         createdBy: {
           connect: {
             id: user.id,

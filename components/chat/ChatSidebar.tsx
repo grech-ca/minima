@@ -4,12 +4,13 @@ import ChatTab from 'components/chat/ChatTab';
 
 import useAppDispatch from 'hooks/useAppDispatch';
 import useAppSelector from 'hooks/useAppSelector';
+import useModal from 'hooks/useModal';
 
 import { setActiveChat } from 'ducks/chat/chatSlice';
 
 import { useConversationsQuery, User } from 'generated/graphql';
 
-const getMembersNames = (members: User[]) => {
+const getMembersNames = (members: Pick<User, 'name' | 'id'>[]) => {
   return members
     .map(({ name }) => name)
     .slice(0, 3)
@@ -17,6 +18,8 @@ const getMembersNames = (members: User[]) => {
 };
 
 const ChatSidebar: FC = () => {
+  const { openModal } = useModal();
+
   const { activeChat } = useAppSelector(state => state.chat);
 
   const { data } = useConversationsQuery();
@@ -27,12 +30,28 @@ const ChatSidebar: FC = () => {
 
   const handleClick = useCallback(id => dispatch(setActiveChat(id)), [dispatch]);
 
+  const openCreateChat = useCallback(() => openModal('CREATE_CHAT'), [openModal]);
+
   return (
-    <ul className="flex flex-col bg-white w-3/12 rounded-md mr-4 overflow-hidden">
-      {conversations?.map(({ id, members }) => (
-        <ChatTab onClick={handleClick} active={id === activeChat} key={id} id={id} name={getMembersNames(members)} />
-      ))}
-    </ul>
+    <div className="flex flex-col bg-white w-3/12 rounded-md mr-4 overflow-hidden p-3">
+      <div className="flex mb-5">
+        <input
+          className="flex-1 text-gray-600 rounded-md bg-gray-50 placeholder-gray-300 py-1 px-3 focus:outline-none focus:ring-2 focus:ring-indigo-300"
+          placeholder="Search"
+        />
+        <button
+          onClick={openCreateChat}
+          className="transition-colors rounded-md text-2xl text-indigo-400 ml-2 w-8 bg-indigo-50 hover:bg-indigo-100 hover:text-indigo-500 focus:outline-none"
+        >
+          +
+        </button>
+      </div>
+      <ul className="flex flex-col">
+        {conversations?.map(({ id, members }) => (
+          <ChatTab onClick={handleClick} active={id === activeChat} key={id} id={id} name={getMembersNames(members)} />
+        ))}
+      </ul>
+    </div>
   );
 };
 

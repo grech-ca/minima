@@ -83,9 +83,9 @@ const AuthForm: FC = () => {
       })
         .then(({ data: { signup } }) => handleSuccess(signup?.authToken))
         .catch(error => {
-          const { extensions } = error.graphQLErrors[0];
+          const { extensions } = error.graphQLErrors[0] || {};
 
-          if (extensions.code === 'VALIDATION_SCHEMA_ERROR') {
+          if (extensions?.code === 'VALIDATION_SCHEMA_ERROR') {
             setErrors(extensions.validationErrors);
           }
 

@@ -12,10 +12,9 @@ export interface Props {
 const ChatTab: FC<Props> = ({ id, name, active, onClick }) => (
   <li
     onClick={() => onClick(id)}
-    className={classnames(
-      'flex py-4 px-6 hover:bg-gray-50 hover:text-gray-700 text-gray-400 cursor-pointer border-b-2 border-gray-50 last:border-none',
-      { ['bg-indigo-50 text-gray-700']: active },
-    )}
+    className={classnames('transition-all flex py-4 px-6 bg-gray-50 text-gray-400 cursor-pointer mb-2 rounded-md', {
+      ['bg-indigo-50 text-indigo-400']: active,
+    })}
   >
     {name}
   </li>

@@ -4,6 +4,10 @@ import classnames from 'classnames';
 
 import { Field, FieldAttributes, FieldInputProps, FieldProps } from 'formik';
 
+import MetaError from 'components/common/MetaError';
+
+import getErrorStyles from 'helpers/getErrorStyles';
+
 type InputProps = Exclude<
   DetailedHTMLProps<InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>,
   FieldInputProps<string>
@@ -22,12 +26,12 @@ const Input: FC<FieldAttributes<Props>> = ({ inputProps, ...props }) => {
             spellCheck={false}
             className={classnames(
               'bg-gray-50 outline-none rounded-md text-lg py-2 px-4 focus:ring-4 focus:ring-indigo-300',
-              { ['ring-4 ring-red-300']: meta.touched && meta.error },
+              getErrorStyles(meta),
             )}
             {...inputProps}
             {...field}
           />
-          {meta.touched && meta.error && <div className="mt-2 text-red-300 text-capitalize-first">{meta.error}</div>}
+          <MetaError field={props.name} />
         </div>
       )}
     </Field>

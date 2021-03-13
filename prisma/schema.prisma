@@ -25,7 +25,7 @@ model Conversation {
   id          String    @id @default(cuid())
   members     User[]    @relation("conversations")
   messages    Message[]
-  personal    Boolean   @default(true)
+  multiple    Boolean   @default(false)
   createdBy   User      @relation(fields: [createdById], references: [id])
   createdById String
   createdAt   DateTime  @default(now())
