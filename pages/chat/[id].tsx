@@ -5,6 +5,8 @@ import ChatSidebar from 'components/chat/ChatSidebar';
 import Chat from 'components/chat/Chat';
 import CreateChat from 'components/chat/CreateChat';
 
+// TODO: Create subpages instead of duplicate an existing page
+
 const Posts: FC = () => (
   <Fragment>
     <div className="flex flex-col h-full">

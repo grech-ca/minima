@@ -4,11 +4,7 @@ import { matchSorter } from 'match-sorter';
 
 import ChatTab from 'components/chat/ChatTab';
 
-import useAppDispatch from 'hooks/useAppDispatch';
-import useAppSelector from 'hooks/useAppSelector';
 import useModal from 'hooks/useModal';
-
-import { setActiveChat } from 'ducks/chat/chatSlice';
 
 import { useConversationsQuery, User } from 'generated/graphql';
 
@@ -22,12 +18,8 @@ const getMembersNames = (members: Pick<User, 'name' | 'id'>[]) => {
 const ChatSidebar: FC = () => {
   const { openModal } = useModal();
 
-  const { activeChat } = useAppSelector(state => state.chat);
-
   const { data } = useConversationsQuery();
   const { conversations = [] } = data || {};
-
-  const dispatch = useAppDispatch();
 
   const [search, setSearch] = useState('');
 
@@ -43,8 +35,6 @@ const ChatSidebar: FC = () => {
   const chatsBySearch = useMemo(() => {
     return matchSorter(conversations, search, { keys: ['members.*.name'] });
   }, [conversations, search]);
-
-  const handleClick = useCallback(id => dispatch(setActiveChat(id)), [dispatch]);
 
   const openCreateChat = useCallback(() => openModal('CREATE_CHAT'), [openModal]);
 
@@ -67,7 +57,7 @@ const ChatSidebar: FC = () => {
       </div>
       <ul className="flex flex-col overflow-y-auto">
         {(search ? chatsBySearch : conversations).map(({ id, members }) => (
-          <ChatTab onClick={handleClick} active={id === activeChat} key={id} id={id} name={getMembersNames(members)} />
+          <ChatTab key={id} id={id} name={getMembersNames(members)} />
         ))}
       </ul>
     </div>
