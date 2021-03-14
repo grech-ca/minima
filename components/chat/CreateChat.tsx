@@ -11,9 +11,11 @@ import LoadingOverlay from 'components/loading/LoadingOverlay';
 
 import useModal from 'hooks/useModal';
 
-import { useCreateConversationMutation } from 'generated/graphql';
+import CONVERSATIONS_QUERY from 'graphql/queries/conversations';
 
 import { OptionsType } from 'react-select';
+import { MutationUpdaterFn } from '@apollo/client';
+import { CreateConversationMutation, useCreateConversationMutation } from 'generated/graphql';
 
 interface MemberOption {
   label: string;
@@ -61,8 +63,36 @@ const CreateChat: FC = () => {
       members: convertedMembers.map(({ value }) => value),
     };
 
+    const optimisticConversation = {
+      id: `optimistic-chat-${Date.now()}`,
+      members: members.map(({ label }, index) => ({ id: `optimistic-user-${index}`, name: label })),
+    };
+
+    const handleUpdateCache: MutationUpdaterFn<CreateConversationMutation> = (cache, { data }) => {
+      if (!data) return;
+
+      const query = { query: CONVERSATIONS_QUERY };
+
+      const { conversations = [] } = cache.readQuery(query);
+
+      cache.writeQuery({
+        ...query,
+        data: {
+          conversations: [optimisticConversation, ...conversations],
+        },
+      });
+    };
+
     void createChat({
       variables,
+      optimisticResponse: {
+        __typename: 'Mutation',
+        createConversation: {
+          __typename: 'Conversation',
+          ...optimisticConversation,
+        },
+      },
+      update: handleUpdateCache,
     })
       .then(() => {
         closeModal();
@@ -80,7 +110,11 @@ const CreateChat: FC = () => {
   };
 
   return (
-    <Modal className="w-3/12" title="Start a new conversation" name="CREATE_CHAT">
+    <Modal
+      className="w-11/12 sm:w-8/12 md:w-6/12 lg:w-5/12 xl:w-3/12"
+      title="Start a new conversation"
+      name="CREATE_CHAT"
+    >
       <Formik validationSchema={ChatSchema} initialValues={initialValues} onSubmit={handleSubmit} className="w-">
         {({ values: { multiple } }: FormikProps<FormValues>) => (
           <Form>

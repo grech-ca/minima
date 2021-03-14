@@ -41,6 +41,7 @@ const ChatForm: FC = () => {
           id: 'new-message-author-id',
           name: 'Author',
         },
+        createdAt: new Date().toISOString(),
       };
 
       cache.writeQuery({
@@ -55,6 +56,7 @@ const ChatForm: FC = () => {
 
   const handleSend = useCallback(() => {
     if (!activeChat) return;
+    setMessage('');
 
     void sendMessage({
       variables: {
@@ -71,6 +73,7 @@ const ChatForm: FC = () => {
             id: 'new-message-author-id',
             name: 'Author',
           },
+          createdAt: new Date().toISOString(),
         },
       },
       update: handleUpdateCache,
@@ -81,7 +84,6 @@ const ChatForm: FC = () => {
     (e: KeyboardEvent<HTMLTextAreaElement>) => {
       if (!e.shiftKey && e.key === 'Enter') {
         e.preventDefault();
-        setMessage('');
         void handleSend();
       }
     },
@@ -107,6 +109,7 @@ const ChatForm: FC = () => {
         value={message}
         onChange={handleChange}
         onKeyDown={onKeyDown}
+        placeholder="Type message..."
       />
       <button
         type="submit"

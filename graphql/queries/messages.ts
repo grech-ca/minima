@@ -11,6 +11,7 @@ const MESSAGES_QUERY: DocumentNode = gql`
         id
         name
       }
+      createdAt
     }
   }
 `;

@@ -3,7 +3,7 @@ import { FC } from 'react';
 import { MenuListComponentProps } from 'react-select';
 
 const MembersSelectMenuList: FC<MenuListComponentProps<any, any>> = ({ children }) => {
-  return <div>{children}</div>;
+  return <div className="max-h-80">{children}</div>;
 };
 
 export default MembersSelectMenuList;

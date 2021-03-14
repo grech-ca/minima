@@ -9,7 +9,7 @@ const Posts: FC = () => (
   <Fragment>
     <div className="flex flex-col h-full">
       <Header />
-      <div className="flex-1 container flex my-6 align-start overflow-y-hidden">
+      <div className="flex-1 container flex sm:my-6 align-start overflow-y-hidden">
         <ChatSidebar />
         <Chat />
       </div>
