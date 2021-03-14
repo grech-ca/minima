@@ -4,13 +4,11 @@ import { DocumentNode } from 'graphql';
 
 const CONVERSATIONS_QUERY: DocumentNode = gql`
   query conversations {
-    me {
-      conversations {
+    conversations {
+      id
+      members {
         id
-        members {
-          id
-          name
-        }
+        name
       }
     }
   }

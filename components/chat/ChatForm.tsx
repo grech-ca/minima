@@ -1,8 +1,7 @@
 import { FC, useState, useCallback, ChangeEvent, KeyboardEvent, FormEvent } from 'react';
+import { useRouter } from 'next/router';
 
 import PaperPlaneIcon from 'components/icons/PaperPlane';
-
-import useAppSelector from 'hooks/useAppSelector';
 
 import MESSAGES_QUERY from 'graphql/queries/messages';
 
@@ -10,7 +9,8 @@ import { MutationUpdaterFn } from '@apollo/client';
 import { SendMessageMutation, useSendMessageMutation } from 'generated/graphql';
 
 const ChatForm: FC = () => {
-  const { activeChat } = useAppSelector(state => state.chat);
+  const router = useRouter();
+  const { id } = router.query;
 
   const [sendMessage] = useSendMessageMutation();
 
@@ -28,7 +28,7 @@ const ChatForm: FC = () => {
       const query = {
         query: MESSAGES_QUERY,
         variables: {
-          id: activeChat,
+          id: id as string,
         },
       };
 
@@ -41,6 +41,7 @@ const ChatForm: FC = () => {
           id: 'new-message-author-id',
           name: 'Author',
         },
+        createdAt: new Date().toISOString(),
       };
 
       cache.writeQuery({
@@ -50,15 +51,15 @@ const ChatForm: FC = () => {
         },
       });
     },
-    [activeChat, message],
+    [id, message],
   );
 
   const handleSend = useCallback(() => {
-    if (!activeChat) return;
+    setMessage('');
 
     void sendMessage({
       variables: {
-        id: activeChat,
+        id: id as string,
         content: message,
       },
       optimisticResponse: {
@@ -71,17 +72,17 @@ const ChatForm: FC = () => {
             id: 'new-message-author-id',
             name: 'Author',
           },
+          createdAt: new Date().toISOString(),
         },
       },
       update: handleUpdateCache,
     }).catch(err => console.error(err));
-  }, [activeChat, handleUpdateCache, message, sendMessage]);
+  }, [handleUpdateCache, id, message, sendMessage]);
 
   const onKeyDown = useCallback(
     (e: KeyboardEvent<HTMLTextAreaElement>) => {
       if (!e.shiftKey && e.key === 'Enter') {
         e.preventDefault();
-        setMessage('');
         void handleSend();
       }
     },
@@ -107,6 +108,7 @@ const ChatForm: FC = () => {
         value={message}
         onChange={handleChange}
         onKeyDown={onKeyDown}
+        placeholder="Type message..."
       />
       <button
         type="submit"

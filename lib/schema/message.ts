@@ -13,6 +13,8 @@ export const Message = objectType({
     t.string('id');
     t.string('content');
 
+    t.model.createdAt();
+
     t.field('author', {
       type: 'User',
       resolve: ({ id }) =>
@@ -32,5 +34,5 @@ export const messagesQueryField = queryField('messages', {
   },
   shield: chain(isAuthenticated(), isInChat()),
   resolve: async (_, { conversationId }) =>
-    await prisma.message.findMany({ where: { conversation: { id: conversationId } } }),
+    await prisma.message.findMany({ where: { conversation: { id: conversationId } }, orderBy: { createdAt: 'desc' } }),
 });

@@ -1,27 +1,29 @@
 import { FC } from 'react';
+import { useRouter } from 'next/router';
 
-import Message from 'components/chat/Message';
+import MessageComponent from 'components/chat/Message';
+import LoadingOverlay from 'components/loading/LoadingOverlay';
 
-import useAppSelector from 'hooks/useAppSelector';
-
-import { useMessagesQuery } from 'generated/graphql';
+import { useMessagesQuery, Message } from 'generated/graphql';
 
 const Messages: FC = () => {
-  const { activeChat } = useAppSelector(state => state.chat);
+  const router = useRouter();
+  const { id } = router.query;
 
-  const { data } = useMessagesQuery({
+  const { data, loading } = useMessagesQuery({
+    fetchPolicy: 'cache-and-network',
     variables: {
-      id: activeChat,
+      id: id as string,
     },
-    skip: !activeChat,
   });
   const { messages = [] } = data || {};
 
   return (
-    <div className="flex flex-1 flex-col-reverse mb-4 overflow-y-auto items-start">
-      {messages.map(({ id, content }) => (
-        <Message key={id} content={content} />
+    <div className="relative flex flex-1 flex-col-reverse mb-4 overflow-y-auto items-start">
+      {messages.map(message => (
+        <MessageComponent key={message.id} message={message as Message} />
       ))}
+      {loading && !data && <LoadingOverlay />}
     </div>
   );
 };

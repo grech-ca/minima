@@ -11,6 +11,7 @@ const SEND_MESSAGE_MUTATION: DocumentNode = gql`
         id
         name
       }
+      createdAt
     }
   }
 `;

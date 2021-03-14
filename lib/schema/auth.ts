@@ -8,8 +8,14 @@ import * as yup from 'yup';
 
 import prisma from '../../lib/prisma';
 
-export interface FormErrors {
-  [key: string]: string;
+import FormError from '../errors/FormError';
+
+import validateSchema from '../utils/validateSchema';
+
+interface SignupSchema {
+  username: string;
+  email: string;
+  password: string;
 }
 
 const signupSchema = yup.object().shape({
@@ -49,12 +55,8 @@ export const signupMutationField = mutationField('signup', {
     email: nonNull(stringArg()),
   },
   resolve: async (_, args) => {
-    await signupSchema.validate(args, { abortEarly: false }).catch(errors => {
-      const schemaErrors: FormErrors = errors.inner.reduce((errorsObject: FormErrors, { path, message }: any) => {
-        return { ...errorsObject, [path]: message };
-      }, {});
-
-      throw new ApolloError('Validation Failed', 'VALIDATION_SCHEMA_ERROR', { validationErrors: schemaErrors });
+    await validateSchema<SignupSchema>(args, signupSchema).catch(errors => {
+      throw new FormError(errors);
     });
 
     const { password, username, email } = args;

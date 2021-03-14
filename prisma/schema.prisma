@@ -17,13 +17,18 @@ model Message {
   authorId       String
   conversation   Conversation? @relation(fields: [conversationId], references: [id])
   conversationId String?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @default(now())
 }
 
 model Conversation {
-  id       String    @id @default(cuid())
-  members  User[]
-  messages Message[]
-  personal Boolean   @default(true)
+  id          String    @id @default(cuid())
+  members     User[]    @relation("conversations")
+  messages    Message[]
+  multiple    Boolean   @default(false)
+  createdBy   User      @relation(fields: [createdById], references: [id])
+  createdById String
+  createdAt   DateTime  @default(now())
 }
 
 model User {
@@ -31,12 +36,14 @@ model User {
   name          String         @unique
   email         String         @unique
   password      String
-  conversations Conversation[]
+  conversations Conversation[] @relation("conversations")
   messages      Message[]
   posts         Post[]
   savedPosts    Post[]         @relation("savedPosts")
   likedPOsts    Post[]         @relation("likedPosts")
   comments      Comment[]
+  Conversation  Conversation[]
+  createdAt     DateTime       @default(now())
 }
 
 model Post {
