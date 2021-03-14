@@ -34,5 +34,5 @@ export const messagesQueryField = queryField('messages', {
   },
   shield: chain(isAuthenticated(), isInChat()),
   resolve: async (_, { conversationId }) =>
-    await prisma.message.findMany({ where: { conversation: { id: conversationId } } }),
+    await prisma.message.findMany({ where: { conversation: { id: conversationId } }, orderBy: { createdAt: 'desc' } }),
 });
