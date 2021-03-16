@@ -8,6 +8,7 @@ export const User = objectType({
   definition(t) {
     t.string('id');
     t.string('name');
+    t.string('status');
     t.string('email');
     t.string('avatarColor');
     t.string('avatarIcon');
