@@ -3,14 +3,20 @@ import { useRouter } from 'next/router';
 
 import PaperPlaneIcon from 'components/icons/PaperPlane';
 
+import useUser from 'hooks/useUser';
+
 import MESSAGES_QUERY from 'graphql/queries/messages';
 
 import { MutationUpdaterFn } from '@apollo/client';
 import { SendMessageMutation, useSendMessageMutation } from 'generated/graphql';
 
+// TODO: Prevent blank messages submit
+
 const ChatForm: FC = () => {
   const router = useRouter();
   const { id } = router.query;
+
+  const me = useUser();
 
   const [sendMessage] = useSendMessageMutation();
 
@@ -37,10 +43,7 @@ const ChatForm: FC = () => {
       const newMessage = {
         id: `new-message-id-${Date.now()}`,
         content: message,
-        author: {
-          id: 'new-message-author-id',
-          name: 'Author',
-        },
+        author: me,
         createdAt: new Date().toISOString(),
       };
 
@@ -51,7 +54,7 @@ const ChatForm: FC = () => {
         },
       });
     },
-    [id, message],
+    [id, me, message],
   );
 
   const handleSend = useCallback(() => {

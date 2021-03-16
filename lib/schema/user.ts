@@ -9,6 +9,8 @@ export const User = objectType({
     t.string('id');
     t.string('name');
     t.string('email');
+    t.string('avatarColor');
+    t.string('avatarIcon');
 
     t.model.createdAt();
 

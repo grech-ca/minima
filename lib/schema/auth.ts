@@ -1,3 +1,6 @@
+import fs from 'fs';
+import { join } from 'path';
+
 import { ApolloError } from 'apollo-server-micro';
 
 import { objectType, nonNull, stringArg, mutationField } from 'nexus';
@@ -17,6 +20,8 @@ interface SignupSchema {
   email: string;
   password: string;
 }
+
+const publicDirectory = join(process.cwd(), 'public');
 
 const signupSchema = yup.object().shape({
   username: yup
@@ -38,6 +43,21 @@ const signupSchema = yup.object().shape({
       return !user;
     }),
   password: yup.string().min(5),
+  avatarColor: yup
+    .string()
+    .matches(new RegExp('^#([0-9A-F]{3}){1,2}$', 'i'), { message: 'Color must be in hex format' }),
+  avatarIcon: yup.string().test({
+    name: 'checkIfIconExists',
+    test: value => {
+      const icons = fs.readdirSync(`${publicDirectory}/avatars`);
+
+      // TODO: Find regex for this
+      const iconExists = icons.some(file => file.split('.')[0] === value);
+
+      return iconExists;
+    },
+    message: 'Icon does not exist',
+  }),
 });
 
 export const AuthPayload = objectType({
@@ -53,13 +73,15 @@ export const signupMutationField = mutationField('signup', {
     username: nonNull(stringArg()),
     password: nonNull(stringArg()),
     email: nonNull(stringArg()),
+    avatarIcon: nonNull(stringArg()),
+    avatarColor: nonNull(stringArg()),
   },
   resolve: async (_, args) => {
     await validateSchema<SignupSchema>(args, signupSchema).catch(errors => {
       throw new FormError(errors);
     });
 
-    const { password, username, email } = args;
+    const { password, username, ...rest } = args;
 
     const hashedPassword = await hash(password, 10);
 
@@ -67,7 +89,7 @@ export const signupMutationField = mutationField('signup', {
       data: {
         name: username,
         password: hashedPassword,
-        email,
+        ...rest,
       },
     });
 

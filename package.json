@@ -48,6 +48,7 @@
     "react-virtualized-auto-sizer": "^1.0.5",
     "react-window": "^1.8.6",
     "react-window-infinite-loader": "^1.0.7",
+    "reactjs-popup": "^2.0.4",
     "short-id": "^0.1.0-1",
     "shortid": "^2.2.16",
     "slugify": "^1.4.7",

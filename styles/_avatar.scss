@@ -1,0 +1,35 @@
+.avatar-picker {
+  animation: appear-avatar-picker .2s normal forwards ease;
+}
+
+@keyframes appear-avatar-picker {
+  from {
+    transform: perspective(1px) translateZ(-0.1px);
+    opacity: 0;
+  }
+  to {
+    transform: perspective(1px) translateZ(0);
+    opacity: 1;
+  }
+}
+
+.avatar-icon-enter {
+  opacity: 0;
+  transform: translateX(-15px);
+}
+
+.avatar-icon-enter-active {
+  opacity: 1;
+  transform: translateX(0);
+  transition: .2s;
+}
+
+.avatar-icon-exit {
+  opacity: 1;
+}
+
+.avatar-icon-exit-active {
+  opacity: 0;
+  transform: translateX(15px);
+  transition: .2s;
+}  

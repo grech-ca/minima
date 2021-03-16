@@ -65,7 +65,7 @@ const CreateChat: FC = () => {
 
     const optimisticConversation = {
       id: `optimistic-chat-${Date.now()}`,
-      members: members.map(({ label }, index) => ({ id: `optimistic-user-${index}`, name: label })),
+      members: convertedMembers.map(({ label }, index) => ({ id: `optimistic-user-${index}`, name: label })),
     };
 
     const handleUpdateCache: MutationUpdaterFn<CreateConversationMutation> = (cache, { data }) => {
