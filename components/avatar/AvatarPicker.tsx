@@ -25,9 +25,10 @@ const AvatarPicker: FC<Props> = ({ iconField, colorField }) => {
   const [icon] = useField(iconField);
   const [color] = useField(colorField);
 
-  const iconOptions = useMemo(() => icons.map(icon => ({ icon, color: color.value as string, size: 30 })), [
-    color.value,
-  ]);
+  const iconOptions = useMemo(
+    () => icons.map(icon => ({ icon, color: color.value as string, size: 30, stretch: true })),
+    [color.value],
+  );
 
   const colorOptions = useMemo(() => colors.map(colorOption => ({ color: colorOption })), []);
 
@@ -40,14 +41,11 @@ const AvatarPicker: FC<Props> = ({ iconField, colorField }) => {
       trigger={open => (
         <div
           role="button"
-          className={classnames(
-            'cursor-pointer transition-shadow w-20 h-20 self-center mb-4 focus:outline-none rounded-lg',
-            {
-              ['ring-4 ring-indigo-300']: open,
-            },
-          )}
+          className={classnames('cursor-pointer transition-shadow self-center mb-4 focus:outline-none rounded-lg', {
+            ['ring-4 ring-indigo-300']: open,
+          })}
         >
-          <Avatar icon={icon.value} color={color.value} />
+          <Avatar icon={icon.value} color={color.value} size={80} />
         </div>
       )}
     >

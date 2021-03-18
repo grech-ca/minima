@@ -10,7 +10,7 @@ import MESSAGES_QUERY from 'graphql/queries/messages';
 import { MutationUpdaterFn } from '@apollo/client';
 import { SendMessageMutation, useSendMessageMutation } from 'generated/graphql';
 
-// TODO: Prevent blank messages submit
+// TODO: [MIN-25] Prevent blank messages submit
 
 const ChatForm: FC = () => {
   const router = useRouter();

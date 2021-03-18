@@ -1,5 +1,7 @@
 import { FC } from 'react';
 
+import Link from 'next/link';
+
 import Avatar from 'components/avatar/Avatar';
 
 import useUser from 'hooks/useUser';
@@ -18,9 +20,11 @@ const Header: FC = () => {
         <div className="flex-1" />
         <div className="flex items-center">
           <button className="bg-white rounded-md py-2 px-3 text-gray-900 mr-8 outline-none">Write a post</button>
-          <div className="w-10 h-10">
-            <Avatar icon={me?.avatarIcon} color={me?.avatarColor} size={30} variant="round" />
-          </div>
+          <Link href={`/user/${me?.id}`}>
+            <a className="w-10 h-10">
+              <Avatar icon={me?.avatarIcon} color={me?.avatarColor} size={30} variant="round" />
+            </a>
+          </Link>
         </div>
       </div>
     </div>

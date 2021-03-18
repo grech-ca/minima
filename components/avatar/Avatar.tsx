@@ -12,6 +12,7 @@ interface Props {
   color: string;
   size?: number;
   variant?: AvatarVariant;
+  stretch?: boolean;
 }
 
 const Avatar: FC<Props & HTMLAttributes<HTMLDivElement>> = ({
@@ -19,16 +20,22 @@ const Avatar: FC<Props & HTMLAttributes<HTMLDivElement>> = ({
   color,
   size = 50,
   variant = 'square',
+  stretch,
   ...props
 }) => {
   return (
     <div
       {...props}
-      className={classnames('transition-colors w-full h-full flex items-center justify-center select-none', {
+      className={classnames('transition-colors flex items-center justify-center select-none', {
         'rounded-lg': variant === 'square',
         'rounded-full': variant === 'round',
       })}
-      style={{ backgroundColor: color, padding: `${size * 0.24}px` }}
+      style={{
+        backgroundColor: color,
+        padding: `${size * 0.24}px`,
+        height: stretch ? '100%' : `${size * 1.24}px`,
+        width: stretch ? '100%' : `${size * 1.24}px`,
+      }}
     >
       <SwitchTransition>
         <CSSTransition<undefined>

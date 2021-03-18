@@ -51,7 +51,7 @@ const signupSchema = yup.object().shape({
     test: value => {
       const icons = fs.readdirSync(`${publicDirectory}/avatars`);
 
-      // TODO: Find regex for this
+      // TODO: [MIN-24] Find regex for this
       const iconExists = icons.some(file => file.split('.')[0] === value);
 
       return iconExists;

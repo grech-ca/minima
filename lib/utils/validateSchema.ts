@@ -2,7 +2,7 @@ import { ObjectSchema } from 'yup';
 
 import { FormErrors } from '../errors/FormError';
 
-// TODO: Improve typization
+// TODO: [MIN-26] Improve typization
 const validateSchema = <Schema>(args: Schema, schema: ObjectSchema<any>): Promise<void> => {
   return new Promise((resolve, reject) => {
     schema

@@ -6,6 +6,8 @@ const cache = new InMemoryCache();
 const httpLink = createHttpLink({ uri: 'http://localhost:3000/api' });
 
 const authLink = setContext((_, { headers }) => {
+  if (typeof localStorage === 'undefined') return;
+
   const token = localStorage.getItem('token');
   return {
     headers: {
