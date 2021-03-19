@@ -15,9 +15,9 @@ interface Props {
 }
 
 const MessageComponent: FC<Props> = ({ message: { author, content, createdAt } }) => {
-  const me = useUser();
+  const { user } = useUser();
 
-  const isOutgoing = useMemo(() => me && author && me.id === author.id, [author, me]);
+  const isOutgoing = useMemo(() => user && author && user.id === author.id, [author, user]);
 
   return (
     <div className="inline-flex mr-3 mb-1">

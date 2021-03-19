@@ -20,17 +20,17 @@ import { MutationUpdaterFn } from '@apollo/client';
 type FormValues = Pick<User, 'name' | 'status' | 'avatarColor' | 'avatarIcon'>;
 
 const EditUser: FC = () => {
-  const me = useUser();
+  const { user } = useUser();
 
   const { closeModal } = useModal();
 
   const [updateUser, { loading }] = useUpdateUserMutation();
 
   const intitalValues: FormValues = {
-    name: me?.name || '',
-    status: me?.status || '',
-    avatarIcon: me?.avatarIcon || 'sheep',
-    avatarColor: me?.avatarColor || '#eee',
+    name: user?.name || '',
+    status: user?.status || '',
+    avatarIcon: user?.avatarIcon || 'sheep',
+    avatarColor: user?.avatarColor || '#eee',
   };
 
   const handleSubmit = useCallback(
@@ -65,14 +65,14 @@ const EditUser: FC = () => {
 
       void updateUser({
         variables: {
-          id: me?.id,
+          id: user?.id,
           data: values,
         },
         optimisticResponse: {
           __typename: 'Mutation',
           updateUser: {
             __typename: 'User',
-            id: me?.id,
+            id: user?.id,
             ...values,
           },
         },
@@ -87,7 +87,7 @@ const EditUser: FC = () => {
           }
         });
     },
-    [closeModal, me?.id, updateUser],
+    [closeModal, user, updateUser],
   );
 
   return (

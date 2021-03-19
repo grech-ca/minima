@@ -16,7 +16,7 @@ const ChatForm: FC = () => {
   const router = useRouter();
   const { id } = router.query;
 
-  const me = useUser();
+  const { user } = useUser();
 
   const [sendMessage] = useSendMessageMutation();
 
@@ -43,7 +43,7 @@ const ChatForm: FC = () => {
       const newMessage = {
         id: `new-message-id-${Date.now()}`,
         content: message,
-        author: me,
+        author: user,
         createdAt: new Date().toISOString(),
       };
 
@@ -54,7 +54,7 @@ const ChatForm: FC = () => {
         },
       });
     },
-    [id, me, message],
+    [id, user, message],
   );
 
   const handleSend = useCallback(() => {
