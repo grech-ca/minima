@@ -20,7 +20,7 @@ interface Props {
 }
 
 const UserPage: FC<Props> = ({ user }) => {
-  const { avatarColor, avatarIcon, name, createdAt } = user || {};
+  const { avatarColor, avatarIcon, name, createdAt, status } = user || {};
 
   if (!user) {
     return (
@@ -46,6 +46,7 @@ const UserPage: FC<Props> = ({ user }) => {
             <Avatar icon={avatarIcon} color={avatarColor} size={120} variant="round" />
           </div>
           <h1 className="mb-2 text-4xl font-bold text-gray-600">{name}</h1>
+          {status && <span className="text-gray-500 text-xl mb-2">&laquo;{status}&raquo;</span>}
           <span className="text-gray-700">Joined {format(new Date(createdAt), 'PPP')}</span>
         </div>
       </div>

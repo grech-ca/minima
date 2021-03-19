@@ -8,9 +8,13 @@ import Link from 'next/link';
 import Avatar from 'components/avatar/Avatar';
 
 import useUser from 'hooks/useUser';
+import useModal from 'hooks/useModal';
 
 const UserMenu: FC = () => {
   const me = useUser();
+  const { openModal } = useModal();
+
+  const open = () => openModal('EDIT_USER');
 
   return (
     <Popup
@@ -45,7 +49,9 @@ const UserMenu: FC = () => {
         <hr />
         <li className="transition-colors hover:bg-gray-50">
           <Link href={`/user/${me?.id}`}>
-            <a className="flex items-center py-1.5 px-2 text-gray-500">Edit profile</a>
+            <button onClick={open} className="flex items-center py-1.5 px-2 text-gray-500 focus:outline-none w-full">
+              Edit profile
+            </button>
           </Link>
         </li>
         <li className="transition-colors hover:bg-gray-50">
