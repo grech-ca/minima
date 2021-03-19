@@ -21,15 +21,20 @@ const Avatar: FC<Props & HTMLAttributes<HTMLDivElement>> = ({
   size = 50,
   variant = 'square',
   stretch,
+  className,
   ...props
 }) => {
   return (
     <div
       {...props}
-      className={classnames('transition-colors flex items-center justify-center select-none', {
-        'rounded-lg': variant === 'square',
-        'rounded-full': variant === 'round',
-      })}
+      className={classnames(
+        'transition-colors flex items-center justify-center select-none',
+        {
+          'rounded-lg': variant === 'square',
+          'rounded-full': variant === 'round',
+        },
+        className,
+      )}
       style={{
         backgroundColor: color,
         padding: `${size * 0.24}px`,
