@@ -10,6 +10,8 @@ const MESSAGES_QUERY: DocumentNode = gql`
       author {
         id
         name
+        avatarIcon
+        avatarColor
       }
       createdAt
     }

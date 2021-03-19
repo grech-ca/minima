@@ -6,7 +6,7 @@ import { FieldShieldResolver } from 'nexus-shield';
 
 const isMyself = <TypeName extends string, FieldName extends string>(): FieldShieldResolver<TypeName, FieldName> =>
   ruleType<TypeName, FieldName>({
-    resolve: ({ id }, __, { user }) => {
+    resolve: (_, { id }, { user }) => {
       if (id !== user.id) throw new ApolloError('Access denied');
 
       return true;

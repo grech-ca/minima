@@ -8,23 +8,31 @@ import { CSSTransition } from 'react-transition-group';
 
 import Input from 'components/common/Input';
 import LoadingOverlay from 'components/loading/LoadingOverlay';
+import AvatarPicker from 'components/avatar/AvatarPicker';
+
+import icons from 'data/avatars.json';
+import colors from 'data/colors.json';
 
 import { useLoginMutation, useRegisterMutation } from 'generated/graphql';
 
 type AuthMode = 'signin' | 'signup';
 
-interface FormInitialValues {
+interface FormValues {
   username: string;
   password: string;
+  avatarIcon: string;
+  avatarColor: string;
   email?: string;
   repeatPassword?: string;
 }
 
-const initialValues: FormInitialValues = {
+const initialValues: FormValues = {
   username: '',
   email: '',
   password: '',
   repeatPassword: '',
+  avatarIcon: icons[Math.floor(Math.random() * icons.length)],
+  avatarColor: colors[Math.floor(Math.random() * colors.length)],
 };
 
 const LoginSchema = yup.object().shape({
@@ -51,7 +59,10 @@ const AuthForm: FC = () => {
   const handleMode = useCallback(() => setAuthMode(authMode === 'signup' ? 'signin' : 'signup'), [authMode]);
 
   const handleSubmit = useCallback(
-    ({ username, email, password }: FormInitialValues, { resetForm, setErrors }: FormikHelpers<FormInitialValues>) => {
+    (
+      { username, email, password, avatarIcon, avatarColor }: FormValues,
+      { resetForm, setErrors }: FormikHelpers<FormValues>,
+    ) => {
       setIsLoading(true);
 
       const handleSuccess = (token?: string) => {
@@ -79,6 +90,8 @@ const AuthForm: FC = () => {
           username,
           password,
           email,
+          avatarIcon,
+          avatarColor,
         },
       })
         .then(({ data: { signup } }) => handleSuccess(signup?.authToken))
@@ -105,6 +118,9 @@ const AuthForm: FC = () => {
     >
       <Form className="flex flex-col relative bg-white rounded-xl ml-10 px-10 py-16">
         <h1 className="text-4xl font-black mb-12 text-gray-700 text-center mx-10">Join Minima flow</h1>
+        <CSSTransition in={authMode === 'signup'} timeout={300} classNames="login-input" unmountOnExit>
+          <AvatarPicker iconField="avatarIcon" colorField="avatarColor" />
+        </CSSTransition>
         <Input
           name="username"
           inputProps={{

@@ -7,6 +7,9 @@ const ME_QUERY: DocumentNode = gql`
     me {
       id
       name
+      status
+      avatarIcon
+      avatarColor
     }
   }
 `;
