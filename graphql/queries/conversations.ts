@@ -6,6 +6,8 @@ const CONVERSATIONS_QUERY: DocumentNode = gql`
   query conversations {
     conversations {
       id
+      name
+      multiple
       members {
         id
         name

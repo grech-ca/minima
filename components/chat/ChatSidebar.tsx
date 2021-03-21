@@ -6,14 +6,7 @@ import ChatTab from 'components/chat/ChatTab';
 
 import useModal from 'hooks/useModal';
 
-import { useConversationsQuery, User } from 'generated/graphql';
-
-const getMembersNames = (members: Pick<User, 'name' | 'id'>[]) => {
-  return members
-    .map(({ name }) => name)
-    .slice(0, 3)
-    .join(', ');
-};
+import { useConversationsQuery, Conversation } from 'generated/graphql';
 
 const ChatSidebar: FC = () => {
   const { openModal } = useModal();
@@ -33,7 +26,7 @@ const ChatSidebar: FC = () => {
   }, []);
 
   const chatsBySearch = useMemo(() => {
-    return matchSorter(conversations, search, { keys: ['members.*.name'] });
+    return matchSorter(conversations, search, { keys: ['members.*.name', 'name'] });
   }, [conversations, search]);
 
   const openCreateChat = useCallback(() => openModal('CREATE_CHAT'), [openModal]);
@@ -56,8 +49,8 @@ const ChatSidebar: FC = () => {
         </button>
       </div>
       <ul className="flex flex-col overflow-y-auto">
-        {(search ? chatsBySearch : conversations).map(({ id, members }) => (
-          <ChatTab key={id} id={id} name={getMembersNames(members)} />
+        {(search ? chatsBySearch : conversations).map(conversation => (
+          <ChatTab key={conversation.id} conversation={conversation as Conversation} />
         ))}
       </ul>
     </div>

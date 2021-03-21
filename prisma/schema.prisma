@@ -23,6 +23,7 @@ model Message {
 
 model Conversation {
   id          String    @id @default(cuid())
+  name        String?
   members     User[]    @relation("conversations")
   messages    Message[]
   multiple    Boolean   @default(false)

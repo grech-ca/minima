@@ -8,6 +8,7 @@ import Modal from 'components/common/Modal';
 import ChatTypeSwitch from 'components/chat/ChatTypeSwitch';
 import MembersSelect from 'components/chat/MembersSelect';
 import LoadingOverlay from 'components/loading/LoadingOverlay';
+import Input from 'components/common/Input';
 
 import useModal from 'hooks/useModal';
 
@@ -15,7 +16,11 @@ import CONVERSATIONS_QUERY from 'graphql/queries/conversations';
 
 import { OptionsType } from 'react-select';
 import { MutationUpdaterFn } from '@apollo/client';
-import { CreateConversationMutation, useCreateConversationMutation } from 'generated/graphql';
+import {
+  CreateConversationMutation,
+  useCreateConversationMutation,
+  MutationCreateConversationArgs,
+} from 'generated/graphql';
 
 interface MemberOption {
   label: string;
@@ -25,6 +30,7 @@ interface MemberOption {
 interface FormValues {
   multiple: boolean;
   members: OptionsType<MemberOption>;
+  name?: string;
 }
 
 const initialValues: FormValues = {
@@ -55,17 +61,23 @@ const CreateChat: FC = () => {
 
   const [createChat, { loading }] = useCreateConversationMutation();
 
-  const handleSubmit = ({ members, ...values }: FormValues, { setErrors, resetForm }: FormikHelpers<FormValues>) => {
+  const handleSubmit = (
+    { members, name, ...values }: FormValues,
+    { setErrors, resetForm }: FormikHelpers<FormValues>,
+  ) => {
     const convertedMembers: MemberOption[] = Array.isArray(members) ? members : [members];
 
-    const variables = {
+    const variables: MutationCreateConversationArgs = {
       ...values,
       members: convertedMembers.map(({ value }) => value),
     };
 
+    if (values.multiple) variables.name = name;
+
     const optimisticConversation = {
       id: `optimistic-chat-${Date.now()}`,
       members: convertedMembers.map(({ label }, index) => ({ id: `optimistic-user-${index}`, name: label })),
+      name,
     };
 
     const handleUpdateCache: MutationUpdaterFn<CreateConversationMutation> = (cache, { data }) => {
@@ -119,6 +131,7 @@ const CreateChat: FC = () => {
         {({ values: { multiple } }: FormikProps<FormValues>) => (
           <Form>
             <ChatTypeSwitch className="mb-3" />
+            {multiple && <Input name="name" inputProps={{ placeholder: 'Conversation name' }} />}
             <MembersSelect multiple={multiple} className="mb-3" />
             <button
               type="submit"

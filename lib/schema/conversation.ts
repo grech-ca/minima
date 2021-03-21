@@ -28,6 +28,8 @@ export const Conversation = objectType({
   definition(t) {
     t.string('id');
 
+    t.string('name');
+
     t.boolean('multiple');
 
     t.model.createdAt();
@@ -87,9 +89,9 @@ export const conversationsQueryField = queryField('conversations', {
 
 export const createConversationMutationField = mutationField('createConversation', {
   type: 'Conversation',
-  args: { multiple: booleanArg({ default: false }), members: list(nonNull(stringArg())) },
+  args: { name: stringArg(), multiple: booleanArg({ default: false }), members: list(nonNull(stringArg())) },
   shield: isAuthenticated(),
-  resolve: async (_, { multiple, members }, { user }) => {
+  resolve: async (_, { multiple, members, name }, { user }) => {
     const args = {
       multiple,
       members: members.filter(id => id !== user.id),
@@ -118,6 +120,15 @@ export const createConversationMutationField = mutationField('createConversation
               message: 'You already have a personal chat with this person',
             }),
         }),
+      name: yup.string().when('multiple', {
+        is: false,
+        then: schema =>
+          schema.test({
+            name: 'nameIsProvided',
+            test: name => name === undefined,
+            message: 'You cannot set name to the personal conversation.',
+          }),
+      }),
     });
 
     await validateSchema<ConversationSchema>(args, conversationSchema).catch(errors => {
@@ -128,6 +139,7 @@ export const createConversationMutationField = mutationField('createConversation
 
     const conversation = await prisma.conversation.create({
       data: {
+        name,
         multiple,
         createdBy: {
           connect: {
