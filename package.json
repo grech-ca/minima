@@ -52,6 +52,7 @@
     "short-id": "^0.1.0-1",
     "shortid": "^2.2.16",
     "slugify": "^1.4.7",
+    "subscriptions-transport-ws": "^0.9.18",
     "yup": "^0.32.9"
   },
   "devDependencies": {

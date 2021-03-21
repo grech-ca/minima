@@ -189,12 +189,19 @@ export const sendMessageMutationField = mutationField('sendMessage', {
     });
 
     pubsub.publish('sendMessage', {
-      ...message,
+      conversationId,
+      message,
+      authorId: user.id,
     });
 
     return message;
   },
 });
+
+interface MessagesSubPayload {
+  message: NexusGenFieldTypes['Conversation'];
+  conversationId: string;
+}
 
 export const conversationSubscriptionField = subscriptionField('conversationMessages', {
   type: 'Message',
@@ -202,16 +209,9 @@ export const conversationSubscriptionField = subscriptionField('conversationMess
   shield: chain(isAuthenticated(), isInChat()),
   subscribe: withFilter(
     (_, __, { pubsub }: ServerContext) => pubsub.asyncIterator('sendMessage'),
-    async (_, { conversationId }, { user }) => {
-      const conversation = await prisma.conversation.findUnique({
-        where: { id: conversationId },
-        include: { members: true },
-      });
-
-      const access = conversation.members.some(({ id }) => id === user.id);
-
-      return access;
+    ({ conversationId, authorId }, { conversationId: targetConversationId }, { user }) => {
+      return conversationId === targetConversationId && authorId !== user.id;
     },
   ),
-  resolve: (payload: NexusGenFieldTypes['Conversation']) => payload,
+  resolve: (payload: MessagesSubPayload) => payload.message,
 });
