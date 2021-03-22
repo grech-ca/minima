@@ -1,4 +1,4 @@
-import { FC, useMemo } from 'react';
+import { FC, useCallback } from 'react';
 import { useRouter } from 'next/router';
 
 import classnames from 'classnames';
@@ -8,40 +8,22 @@ import Image from 'next/image';
 
 import useUser from 'hooks/useUser';
 
+import getMembersNames from 'helpers/getMembersNames';
+
 import { Conversation, User } from 'generated/graphql';
 
 export interface Props {
   conversation: Conversation;
+  onClick?: () => void;
 }
 
-const getMembersNames = (members: Pick<User, 'name' | 'id'>[]) => {
-  return members
-    .map(({ name }) => name)
-    .slice(0, 3)
-    .join(', ');
-};
-
-const ChatTab: FC<Props> = ({ conversation: { id, name, members, multiple } }) => {
+const ChatTab: FC<Props> = ({ conversation: { id, name, members, multiple }, onClick }) => {
   const router = useRouter();
   const { id: idParam } = router.query;
 
   const { user } = useUser();
 
-  const interlocutors = useMemo(() => {
-    if (multiple) {
-      return members
-        .map(member => {
-          if (member.id === user.id) return { ...member, name: 'You' };
-          return member;
-        })
-        .sort(member => {
-          if (member.id === user.id) return -1;
-          return 0;
-        });
-    }
-
-    return members.filter(member => member.id !== user.id);
-  }, [members, multiple, user.id]);
+  const handleClick = useCallback(() => onClick?.(), [onClick]);
 
   return (
     <li
@@ -54,8 +36,8 @@ const ChatTab: FC<Props> = ({ conversation: { id, name, members, multiple } }) =
       )}
     >
       <Link href={`/chat/${id}`}>
-        <a className="flex justify-between items-center h-full w-full">
-          <label>{name ?? getMembersNames(interlocutors)}</label>
+        <a onClick={handleClick} className="flex justify-between items-center h-full w-full">
+          <label>{name ?? getMembersNames(members, { me: user as User, withoutMe: !multiple })}</label>
           {multiple && (
             <div className="inline-flex items-center opacity-30">
               <span className="text-black mr-1.5 -mb-1">{members.length}</span>

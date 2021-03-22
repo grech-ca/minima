@@ -9,6 +9,7 @@ import Avatar from 'components/avatar/Avatar';
 
 import useUser from 'hooks/useUser';
 import useModal from 'hooks/useModal';
+import useMedia from 'hooks/useMedia';
 
 const UserMenu: FC = () => {
   const { user, logout } = useUser();
@@ -16,10 +17,12 @@ const UserMenu: FC = () => {
 
   const open = () => openModal('EDIT_USER');
 
+  const isMobile = useMedia(['(max-width: 640px)'], [true], false);
+
   return (
     <Popup
       arrow={false}
-      position="bottom center"
+      position={isMobile ? 'bottom right' : 'bottom center'}
       offsetY={10}
       offsetX={8}
       trigger={open => (
@@ -34,7 +37,7 @@ const UserMenu: FC = () => {
         </button>
       )}
     >
-      <ul className="bg-white rounded-md w-48 overflow-hidden avatar-picker">
+      <ul className="bg-white rounded-md w-48 overflow-hidden avatar-picker ring-1 ring-gray-100">
         <li className="transition-colors hover:bg-gray-50">
           <Link href={`/user/${user?.id}`}>
             <a className="flex items-center p-2">

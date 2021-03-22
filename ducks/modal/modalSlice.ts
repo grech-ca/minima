@@ -1,6 +1,6 @@
 import { createSlice, SliceCaseReducers } from '@reduxjs/toolkit';
 
-const modalNames = ['CREATE_CHAT', 'EDIT_USER'] as const;
+const modalNames = ['CREATE_CHAT', 'EDIT_USER', 'MOBILE_CHATS'] as const;
 
 export type ModalName = typeof modalNames[number];
 
