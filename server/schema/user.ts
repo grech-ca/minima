@@ -10,7 +10,7 @@ import * as yup from 'yup';
 import isAuthenticated from '../rules/isAuthenticated';
 import isMyself from '../rules/isMyself';
 
-import prisma from '../../lib/prisma';
+import prisma from '../prisma';
 
 import FormError from '../errors/FormError';
 

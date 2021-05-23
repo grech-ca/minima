@@ -3,14 +3,15 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "yarn generate:client && next build",
+    "dev": "yarn generate && next dev",
+    "build": "yarn generate && next build",
+    "prestart": "yarn generate",
     "start": "next start",
-    "migrate": "npx prisma migrate dev --preview-feature",
-    "generate": "npm -s run generate:prisma && npm -s run generate:nexus",
-    "generate:prisma": "prisma generate",
-    "generate:nexus": "ts-node --transpile-only -P nexus.tsconfig.json pages/api",
-    "generate:client": "graphql-codegen --config codegen.yml"
+    "migrate": "cd ./server/prisma && prisma migrate dev --preview-feature",
+    "generate": "yarn generate:prisma && yarn generate:nexus && yarn generate:graphql",
+    "generate:prisma": "cd ./server/prisma && prisma generate",
+    "generate:nexus": "ts-node --transpile-only -P nexus.tsconfig.json ./pages/api",
+    "generate:graphql": "graphql-codegen --config codegen.yml"
   },
   "dependencies": {
     "@apollo/client": "^3.3.11",
@@ -59,6 +60,7 @@
     "@graphql-codegen/cli": "1.21.1",
     "@graphql-codegen/introspection": "1.18.1",
     "@graphql-codegen/typescript": "1.21.0",
+    "@graphql-codegen/typescript-document-nodes": "^1.17.11",
     "@graphql-codegen/typescript-operations": "1.17.14",
     "@graphql-codegen/typescript-react-apollo": "2.2.1",
     "@types/classnames": "^2.2.11",

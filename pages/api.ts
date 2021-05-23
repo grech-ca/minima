@@ -10,7 +10,7 @@ import { nexusShield } from 'nexus-shield';
 import { nexusPrisma } from 'nexus-plugin-prisma';
 import jwt from 'jsonwebtoken';
 
-import * as allTypes from '../../lib/schema';
+import * as allTypes from '../server/schema';
 
 export interface ServerContext {
   user: any;
@@ -33,8 +33,8 @@ type CustomNextApiHandler = (req: NextApiRequest, res: CustomNextApiResponse) =>
 const schema = makeSchema({
   types: allTypes,
   outputs: {
-    typegen: path.join(process.cwd(), 'pages/api/nexus-typegen.ts'),
-    schema: path.join(process.cwd(), 'pages/api/schema.graphql'),
+    typegen: path.join(process.cwd(), 'generated/nexus-typegen.ts'),
+    schema: path.join(process.cwd(), 'generated/schema.graphql'),
   },
   plugins: [
     nexusShield({

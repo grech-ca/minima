@@ -1,5 +1,5 @@
 overwrite: true
-schema: 'http://localhost:3000/api'
+schema: 'generated/schema.graphql'
 documents: 'graphql/**/*.ts'
 generates:
   generated/graphql.ts:
@@ -7,3 +7,10 @@ generates:
       - 'typescript'
       - 'typescript-operations'
       - 'typescript-react-apollo'
+      - 'typescript-document-nodes'
+    config:
+      reactApolloVersion: 3
+      gqlImport: "@apollo/client/#gql"
+      withHOC: false
+      withHooks: true
+      withComponent: false

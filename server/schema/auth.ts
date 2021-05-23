@@ -9,7 +9,7 @@ import { hash, compare } from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import * as yup from 'yup';
 
-import prisma from '../../lib/prisma';
+import prisma from '../prisma';
 
 import FormError from '../errors/FormError';
 

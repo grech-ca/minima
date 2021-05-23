@@ -17,11 +17,7 @@
 **.lock
 **.debug
 /generated
-/prisma/*
-!/prisma/schema.prisma
-/pages/api/*
-!/pages/api/graphql.ts
-generated
+/server/prisma/temp.sqlite
 
 # misc
 .DS_Store
